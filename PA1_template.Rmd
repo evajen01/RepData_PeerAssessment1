@@ -1,25 +1,47 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+Reproducable Research: Peer Assessment #1
 
+```{r}
+#Loading and preprocessing the data
+data<-read.csv("activity.csv")
+summary(data)
+head(data)
+names(data)
+str(data)
 
-## Loading and preprocessing the data
+#What is the mean total number of steps taken per day?
+steps<-tapply(data$steps, data$date, sum, na.rm=TRUE)
+steps<-data.frame(steps)
+hist(steps$steps, xlab = "steps", main = "Histogram of Total Steps per Day")
+mean(steps$steps)
+median(steps$steps)
 
+#What is the average daily activity pattern?
+intavg<-tapply(data$steps, data$interval, mean, na.rm = TRUE)
+intavgts<-ts(intavg)
+plot.ts(intavgts, xlab="time interval", ylab="avg. steps", main="Average Steps by Time Interval")
 
+#Inputting missing values
+sum(is.na(data))
 
-## What is mean total number of steps taken per day?
+newdata<-data
+newdata$steps[is.na(newdata$steps)] <- 0
+sum(is.na(newdata)) #should reflect 0 after N/A values have been removed
 
+newsteps<-tapply(newdata$steps, newdata$date, sum, na.rm=TRUE)
+newsteps<-data.frame(newsteps)
+hist(newsteps$newsteps, xlab = "steps", main = "Histogram of Total Steps per Day")
+mean(newsteps$newsteps)
+median(newsteps$newsteps)
 
+#Are there differences in activity patterns between weekdays and weekends?
+newdata2<-newdata
+newdata2$weekday<-weekdays(as.Date(newdata2$date))
+newdata2$wkndflag<-ifelse(newdata2$weekday=="Saturday"|newdata2$weekday=="Sunday", "Weekend", "Weekday")
+newdata2$wkndflag<-as.factor(newdata2$wkndflag)
+newdata2wknd<-subset(newdata2, newdata2$wkndflag=="Weekend")
+newdata2wddy<-subset(newdata2, newdata2$wkndflag=="Weekday")
 
-## What is the average daily activity pattern?
-
-
-
-## Imputing missing values
-
-
-
-## Are there differences in activity patterns between weekdays and weekends?
+library(lattice)
+attach(newdata2)
+xyplot(steps~interval|wkndflag)
+```
