@@ -43,5 +43,6 @@ newdata2wddy<-subset(newdata2, newdata2$wkndflag=="Weekday")
 
 library(lattice)
 attach(newdata2)
-xyplot(steps~interval|wkndflag)
+#xyplot(steps~interval|wkndflag)
 ```
+
